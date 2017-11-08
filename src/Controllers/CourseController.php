@@ -38,7 +38,7 @@ class CourseController extends BaseController
     public function edit(Request $request, Response $response, $args) {
         $route = $request->getAttribute('route');
         $courseId = $route->getArgument('id');
-        $data['course'] = $this->container['db']->get('courses', ['name', 'category', 'img', 'author', 'description'], ['id' => $courseId]);
+        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'], ['id' => $courseId]);
         $data['categories'] = $this->container['db']->select('categories', ['id', 'name']);
         $this->title = 'Edit: '.$data['course']['name'];
         if($request->isPost()) {
@@ -71,7 +71,8 @@ class CourseController extends BaseController
         $uploadedFile = $uploadedFiles['img'];
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = $this->moveUploadedFile($directory, $uploadedFile);
-            $response->write('uploaded ' . $filename . '<br/>');
+            $url = $request->getUri()->getBaseUrl().'/uploads/'.$filename;
+            $response->write(json_encode(['url' => $url]));
         }
     }
 

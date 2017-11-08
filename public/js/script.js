@@ -25,12 +25,16 @@ $(document).ready(function() {
         var file = this.files[0];
         var fd = new FormData();
         fd.append("img", file);
+        fd.append("course_id", "Groucho");
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/course/upload', true);
 
         xhr.upload.onprogress = function(e) {
+            document.querySelector('.progress').style.display = 'block';
             if (e.lengthComputable) {
                 var percentComplete = (e.loaded / e.total) * 100;
+                percentComplete = Math.round(percentComplete);
+                document.querySelector('.progress-bar').style.width = percentComplete + '%';
                 console.log(percentComplete + '% uploaded');
             }
         };
@@ -38,9 +42,8 @@ $(document).ready(function() {
             if (this.status == 200) {
                 var resp = JSON.parse(this.response);
                 console.log('Server got:', resp);
-                var image = document.createElement('img');
-                image.src = resp.dataUrl;
-                document.body.appendChild(image);
+                document.querySelector('.update-thumbnail img').src = resp.url;
+                document.querySelector('.progress').style.display = 'none';
             };
         };
         xhr.send(fd);

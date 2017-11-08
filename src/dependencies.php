@@ -45,4 +45,4 @@ $container['CourseController'] = function($c) {
     return new Controllers\CourseController($view);
 };
 
-$container['upload_directory'] = __DIR__ . '/../uploads';
+$container['upload_directory'] = __DIR__ . '/../public/uploads';
