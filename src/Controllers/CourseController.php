@@ -3,6 +3,7 @@ namespace App\Src\Controllers;
 use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Respect\Validation\Validator;
 
 
 class CourseController extends BaseController
@@ -17,7 +18,6 @@ class CourseController extends BaseController
     public function index(Request $request, Response $response, $args) {
         $this->title = "List of courses";
         $data['categories'] = $this->container['db']->select('courses', '*');
-
         $this->render($response,'course/index.twig', $data);
     }
 
@@ -31,20 +31,48 @@ class CourseController extends BaseController
             ]);
             die(json_encode($data));
         } else {
-            return $response->withStatus(404);
+            return $response->withStatus(405);
         }
-
-
     }
 
     public function edit(Request $request, Response $response, $args) {
-
         $route = $request->getAttribute('route');
         $courseId = $route->getArgument('id');
         $data['course'] = $this->container['db']->get('courses', ['name', 'category', 'img', 'author', 'description'], ['id' => $courseId]);
         $data['categories'] = $this->container['db']->select('categories', ['id', 'name']);
         $this->title = 'Edit: '.$data['course']['name'];
+        if($request->isPost()) {
+            $courseValidator = Validator::key('name', Validator::stringType()->length(100,255))
+                                ->key('description', Validator::stringType()->length(200,255))
+                                ->key('category', Validator::numeric());
+            try{
+                $courseValidator->assert($request->getParsedBody());
+            } catch (\InvalidArgumentException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                    'description'     => '{{name}} is required',
+                ));
+            }
+            if($courseValidator->validate()) {
+                die('ok');
+            } else {
+                $data['errors'] = $errors;
+            }
+        }
         $this->render($response, 'course/edit.twig', $data);
+    }
+
+    public function upload(Request $request, Response $response, $args) {
+        $directory = $this->container['upload_directory'];
+
+        $uploadedFiles = $request->getUploadedFiles();
+
+        // handle single input with single file upload
+        $uploadedFile = $uploadedFiles['img'];
+        if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
+            $filename = $this->moveUploadedFile($directory, $uploadedFile);
+            $response->write('uploaded ' . $filename . '<br/>');
+        }
     }
 
     public function add(Request $request, Response $response, $args) {
@@ -58,4 +86,6 @@ class CourseController extends BaseController
     public function __invoke($request, $response, $args) {
         return $response;
     }
+
+
 }

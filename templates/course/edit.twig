@@ -11,18 +11,25 @@
         </div>
     </div>
     <div class="col-sm-6">
+        {% if errors %}
+            <div class="alert alert-danger" role="alert">
+                <strong>Oh snap!</strong>  Change a few things up and try submitting again:
+                {% include '_partials/errors.twig' %}
+            </div>
+
+        {% endif %}
         <div class="row">
-            <form>
+            <form method="post">
                 <div class="form-group">
                     <label for="name">Name:</label>
-                    <input type="text" class="form-control" id="name" placeholder="Name" value="{{ course.name }}">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="{{ course.name }}">
                 </div>
                 <div class="form-group">
                     <label for="description">Description:</label>
-                    <textarea class="form-control" id="description" rows="3">{{ course.description }}</textarea>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ course.description }}</textarea>
                 </div>
                 <div class="form-group">
-                    <select class="form-control">
+                    <select name="category" class="form-control">
                         {% for category in categories %}
                             {% if category.id == course.category %}
                                 <option value="{{ category.id }}" selected>{{ category.name|e }}</option>
@@ -32,12 +39,22 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
-                    <input type="file" id="exampleInputFile">
-                    <p class="help-block">Example block-level help text here.</p>
+                <div class="form-group clearfix">
+                    <div class="col-xs-6 col-md-6">
+                        <a href="#" class="thumbnail update-thumbnail">
+                            <img src="{{ course.img }}">
+                        </a>
+                    </div>
+                    <input type="file" id="course-cover" name="img" class="cover">
+                    <p class="help-block">Pls click on the picture to change it.</p>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
+                            <span class="sr-only">20% Complete</span>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-info">Update</button>
+
             </form>
         </div>
     </div>

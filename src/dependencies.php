@@ -44,3 +44,5 @@ $container['CourseController'] = function($c) {
     $view = new Twig($settings['template_path'], compact('$settings["cache"]'));
     return new Controllers\CourseController($view);
 };
+
+$container['upload_directory'] = __DIR__ . '/uploads';

@@ -5,3 +5,11 @@ body {
 .left-navigation {
     margin-top: 20px;
 }
+
+.cover {
+    display: none !important;
+}
+
+.progress {
+    display: none;
+}

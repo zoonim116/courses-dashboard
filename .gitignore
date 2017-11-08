@@ -7,3 +7,5 @@ phpunit.xml
 tests/
 CONTRIBUTING.md
 README.md
+docker-compose.yml
+composer.lock
