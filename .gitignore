@@ -1,0 +1,9 @@
+/vendor/
+/logs/*
+!/logs/README.md
+.idea/
+.DS_Store
+phpunit.xml
+tests/
+CONTRIBUTING.md
+README.md
