@@ -70,10 +70,19 @@ class CourseController extends BaseController
                     'category' => '{{name}} is required',
                 ));
             }
-            if($courseValidator->validate()) {
-                $this->container['db']->insert('courses', [
-
+            if($courseValidator->validate($request->getParsedBody())) {
+                $input = $request->getParsedBody();
+                $this->container['db']->update('courses', [
+                    'name' => $input['name'],
+                    'description' => $input['description'],
+                    'author' => $input['author'],
+                    'img' => $input['img_url'],
+                    'category' => $input['category']
+                ], [
+                    "id[=]" => $courseId
                 ]);
+                $data['course'] = $input;
+                $data['course']['img'] = $input['img_url'];
             } else {
                 $data['errors'] = $errors;
             }
@@ -112,8 +121,6 @@ class CourseController extends BaseController
     public function add(Request $request, Response $response, $args) {
         $this->title = 'Add new item';
         if($request->isPost()) {
-//            echo "<pre>";
-//            die(var_dump($request->getParsedBody()));
             $courseValidator = Validator::key('name', Validator::stringType()->length(2,255))
                                 ->key('description', Validator::stringType()->length(1,255))
                                 ->key('author', Validator::stringType()->length(1,100))
@@ -123,8 +130,6 @@ class CourseController extends BaseController
             try{
                 $courseValidator->assert($request->getParsedBody());
             } catch (NestedValidationException $e) {
-                echo "<pre>";
-                die(var_dump($e->getMessages()));
                 $errors = $e->findMessages(array(
                     'name'     => '{{name}} is required',
                     'description' => '{{name}} is required',
@@ -146,6 +151,7 @@ class CourseController extends BaseController
                 $data['errors'] = $errors;
             }
             $data['course'] = $request->getParsedBody();
+            $data['course']['img'] = $data['img_url'];
         } else {
             $data['course'] = ['img' => $request->getUri()->getBaseUrl().'/img/no_image.jpeg'];
         }
