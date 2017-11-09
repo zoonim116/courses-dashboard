@@ -42,8 +42,10 @@ class CourseController extends BaseController
         $data['categories'] = $this->container['db']->select('categories', ['id', 'name']);
         $this->title = 'Edit: '.$data['course']['name'];
         if($request->isPost()) {
-            $courseValidator = Validator::key('name', Validator::stringType()->length(100,255))
-                                ->key('description', Validator::stringType()->length(200,255))
+            $courseValidator = Validator::key('name', Validator::stringType()->length(2,255))
+                                ->key('description', Validator::stringType()->length(2,255))
+                                ->key('author', Validator::stringType()->length(2,255))
+                                ->key('img_url', Validator::url())
                                 ->key('category', Validator::numeric());
             try{
                 $courseValidator->assert($request->getParsedBody());
@@ -77,11 +79,32 @@ class CourseController extends BaseController
     }
 
     public function add(Request $request, Response $response, $args) {
+        $data['course'] = ['img' => $request->getUri()->getBaseUrl().'/img/no_image.jpeg'];
+        $this->title = 'Add new item';
         if($request->isPost()) {
+            $courseValidator = Validator::key('name', Validator::stringType()->length(2,255))
+                ->key('description', Validator::stringType()->length(2,255))
+                ->key('author', Validator::stringType()->length(2,255))
+                ->key('img_url', Validator::url())
+                ->key('category', Validator::numeric());
+            try{
+                $courseValidator->assert($request->getParsedBody());
 
+            } catch (\InvalidArgumentException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                    'description'     => '{{name}} is required',
+                ));
+            }
+            if($courseValidator->validate()) {
+                die('ok');
+            } else {
+                $data['errors'] = $errors;
+            }
         }
-        $data = [];
-        $this->render($response, 'course/edit.twig', $data);
+        $data['categories'] = $this->container['db']->select('categories', ['id', 'name']);
+
+        $this->render($response, 'course/add.twig', $data);
     }
 
     public function __invoke($request, $response, $args) {

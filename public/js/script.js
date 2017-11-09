@@ -8,14 +8,39 @@ $(document).ready(function() {
             { data: 'id' },
             { data: 'name' },
             { data: 'category' },
-            { data: 'author' }
+            { data: 'author' },
+            { data: 'action' },
         ],
         "columnDefs": [ {
             "targets": -1,
-            // "data": null,
-            "defaultContent": "<button>Edit</button>"
+            "data": 'action',
+            "defaultContent": '<div class="dropdown">\n' +
+            '    <button class="btn btn-default btn-xs dropdown-toggle"  type="button" data-toggle="dropdown">Select\n' +
+            '    <span class="caret"></span></button>\n' +
+            '    <ul class="dropdown-menu" role="menu">\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
+            '    </ul>\n' +
+            '  </div>'
         } ]
     });
+
+    $('#courses-list tbody').on( 'click', 'a', function () {
+        var data = table.row( $(this).parents('tr') ).data();
+        switch ($(this).attr('data-action')) {
+            case 'view' :
+                location.href = location.href + 'course/view/' + data.id;
+                break;
+            case 'edit' :
+                location.href = location.href + 'course/edit/' + data.id;
+                break;
+            default:
+                location.href = location.href + 'course/view/' + data.id;
+                break;
+        }
+        return false;
+
+    } );
 
     $('.update-thumbnail').on('click', function () {
         $('#course-cover').trigger('click');
@@ -35,7 +60,6 @@ $(document).ready(function() {
                 var percentComplete = (e.loaded / e.total) * 100;
                 percentComplete = Math.round(percentComplete);
                 document.querySelector('.progress-bar').style.width = percentComplete + '%';
-                console.log(percentComplete + '% uploaded');
             }
         };
         xhr.onload = function() {
@@ -44,6 +68,7 @@ $(document).ready(function() {
                 console.log('Server got:', resp);
                 document.querySelector('.update-thumbnail img').src = resp.url;
                 document.querySelector('.progress').style.display = 'none';
+                document.querySelector('[name="img_url"]').value = resp.url;
             };
         };
         xhr.send(fd);
