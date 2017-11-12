@@ -45,4 +45,10 @@ $container['CourseController'] = function($c) {
     return new Controllers\CourseController($view);
 };
 
+$container['LessonController'] = function($c) {
+    $settings = $c->get('settings')['renderer'];
+    $view = new Twig($settings['template_path'], compact('$settings["cache"]'));
+    return new Controllers\LessonController($view);
+};
+
 $container['upload_directory'] = __DIR__ . '/../public/uploads';

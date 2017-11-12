@@ -13,3 +13,8 @@ body {
 .progress {
     display: none;
 }
+
+.alert-danger ol {
+    margin-top: 6px;
+    font-weight: bold;
+}

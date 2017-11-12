@@ -42,4 +42,7 @@ class BaseController
         return $filename;
     }
 
+    public function __invoke($request, $response, $args) {
+        return $response;
+    }
 }

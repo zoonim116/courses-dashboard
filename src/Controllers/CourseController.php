@@ -1,7 +1,6 @@
 <?php
 namespace App\Src\Controllers;
 use Respect\Validation\Exceptions\NestedValidationException;
-use Slim\Views\Twig;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Respect\Validation\Validator;
@@ -41,6 +40,14 @@ class CourseController extends BaseController
         }
     }
 
+    public function view(Request $request, Response $response, $args) {
+        $route = $request->getAttribute('route');
+        $courseId = $route->getArgument('id');
+        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'],
+                                                                ['id' => $courseId]);
+        $this->render($response, 'course/view.twig', $data);
+    }
+
     /**
      * Edit Course
      * @param Request $request
@@ -50,7 +57,8 @@ class CourseController extends BaseController
     public function edit(Request $request, Response $response, $args) {
         $route = $request->getAttribute('route');
         $courseId = $route->getArgument('id');
-        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'], ['id' => $courseId]);
+        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'],
+                                                                ['id' => $courseId]);
         $data['categories'] = $this->container['db']->select('categories', ['id', 'name']);
         $this->title = 'Edit: '.$data['course']['name'];
         if($request->isPost()) {
@@ -160,10 +168,4 @@ class CourseController extends BaseController
 
         $this->render($response, 'course/add.twig', $data);
     }
-
-    public function __invoke($request, $response, $args) {
-        return $response;
-    }
-
-
 }
