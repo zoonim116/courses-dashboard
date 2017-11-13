@@ -21,14 +21,14 @@
                 <strong>Well done!</strong>
                 Course successfully saved.
             </div>
-        {% endif  %}
+        {% endif %}
         {% if flash('success')  %}
             <div class="alert alert-success" role="alert">
                 {% for msg in flash('success') %}
                     {{ msg }}
                 {% endfor %}
             </div>
-        {% endif  %}
+        {% endif %}
         <div class="row">
             {% include 'course/_form.twig' %}
         </div>

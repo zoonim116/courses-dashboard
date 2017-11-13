@@ -19,4 +19,38 @@ class LessonController extends BaseController {
         }
     }
 
+    public function add(Request $request, Response $response, $args) {
+        $this->title = 'Add new item';
+        $route = $request->getAttribute('route');
+        $courseId = $route->getArgument('id');
+
+        if($request->isPost()) {
+            $courseValidator = Validator::key('name', Validator::stringType()->length(2,255));
+
+            try{
+                $courseValidator->assert($request->getParsedBody());
+            } catch (NestedValidationException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                ));
+            }
+            if($courseValidator->validate($request->getParsedBody()) && isset($courseId) && !empty($courseId) && intval($courseId)) {
+                $data = $request->getParsedBody();
+                $this->container['db']->insert('lessons', [
+                    'name' => $data['name'],
+                    'course_id' => intval($courseId),
+                    'slides_cnt' => 0,
+                ]);
+                $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
+            } else {
+                $data['errors'] = $errors;
+            }
+        }
+
+        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'],
+            ['id' => $courseId]);
+
+        $this->render($response, 'lesson/add.twig', $data);
+    }
+
 }
