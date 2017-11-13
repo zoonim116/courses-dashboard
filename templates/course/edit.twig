@@ -16,8 +16,14 @@
                 <strong>Oh snap!</strong>  Change a few things up and try submitting again:
                 {% include '_partials/errors.twig' %}
             </div>
-
         {% endif %}
+        {% if flash('success')  %}
+            <div class="alert alert-success" role="alert">
+                {% for msg in flash('success') %}
+                    {{ msg }}
+                {% endfor %}
+            </div>
+        {% endif  %}
         <div class="row">
             {% include 'course/_form.twig' %}
         </div>

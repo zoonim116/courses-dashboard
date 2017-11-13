@@ -91,6 +91,7 @@ class CourseController extends BaseController
                 ]);
                 $data['course'] = $input;
                 $data['course']['img'] = $input['img_url'];
+                $this->container['flash']->addMessage('success', 'Course successfully saved.');
             } else {
                 $data['errors'] = $errors;
             }
@@ -155,6 +156,7 @@ class CourseController extends BaseController
                     'img' => $data['img_url'],
                     'category' => $data['category']
                 ]);
+                $this->container['flash']->addMessage('success', 'Course successfully saved.');
             } else {
                 $data['errors'] = $errors;
             }

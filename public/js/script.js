@@ -1,5 +1,8 @@
 $(document).ready(function() {
     var courses = $('#courses-list').DataTable({
+        "processing": true,
+        //"serverSide": true, // recommended to use serverSide when data is more than 10000 rows for performance reasons
+        "stateSave": true,
         "ajax": {
             url: "/course/all",
             dataSrc: ''
@@ -25,7 +28,8 @@ $(document).ready(function() {
         } ]
     });
 
-    $('#courses-list tbody').on( 'click', 'a', function () {
+    $('#courses-list tbody').on( 'click', 'a', function (e) {
+        e.preventDefault();
         var data = courses.row( $(this).parents('tr') ).data();
         switch ($(this).attr('data-action')) {
             case 'view' :
@@ -43,6 +47,9 @@ $(document).ready(function() {
     });
 
     var lessons = $('#lessons-list').DataTable({
+        "processing": true,
+        //"serverSide": true, // recommended to use serverSide when data is more than 10000 rows for performance reasons
+        "stateSave": true,
         "ajax": {
             url: "/lesson/by-course/" + window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1),
             dataSrc: ''
@@ -65,6 +72,24 @@ $(document).ready(function() {
             '    </ul>\n' +
             '  </div>'
         } ]
+    });
+
+    $('#lessons-list tbody').on( 'click', 'a', function (e) {
+        e.preventDefault();
+        var data = lessons.row( $(this).parents('tr') ).data();
+        switch ($(this).attr('data-action')) {
+            case 'view' :
+                location.href = location.origin + '/lesson/view/' + data.id;
+                break;
+            case 'edit' :
+                location.href = location.origin + '/lesson/edit/' + data.id;
+                break;
+            default:
+                location.href = location.origin + '/lesson/view/' + data.id;
+                break;
+        }
+        return false;
+
     });
 
     $('.update-thumbnail').on('click', function () {

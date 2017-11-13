@@ -31,6 +31,9 @@ $container['view'] = function($container) {
     $view = new \Slim\Views\Twig($settings['template_path'], compact('$settings["cache"]'));
 
     $view->addExtension(new Slim\Views\TwigExtension($container['router'], $container['request']->getUri()));
+    $view->addExtension(new Knlv\Slim\Views\TwigMessages(
+        new Slim\Flash\Messages()
+    ));
     return $view;
 };
 
