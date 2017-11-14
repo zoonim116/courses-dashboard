@@ -12,8 +12,14 @@ class LessonController extends BaseController {
         if($request->isXhr()) {
             $route = $request->getAttribute('route');
             $courseId = $route->getArgument('id');
-            $result = $this->container['db']->select('lessons', ['id', 'name', 'slides_cnt(slides)'], ['course_id' => $courseId]);
-            die(json_encode($result));
+            $lessons = $this->container['db']->select('lessons', ['id', 'name', 'slides_cnt(slides)'], ['course_id' => $courseId]);
+            foreach ($lessons as $key => $lesson) {
+                $lessons[$key]['questions'] = $this->container['db']->count('slides',['AND' => [
+                    'answer[!]' => '',
+                    'lesson_id' => $lesson['id']
+                ]]);
+            }
+            die(json_encode($lessons));
         } else {
             return $response->withStatus(405);
         }

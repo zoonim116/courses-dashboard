@@ -58,6 +58,7 @@ $(document).ready(function() {
             { data: 'id' },
             { data: 'name' },
             { data: 'slides' },
+            { data: 'questions' },
             { data: 'action' },
         ],
         "columnDefs": [ {
