@@ -59,4 +59,40 @@ class LessonController extends BaseController {
         $this->render($response, 'lesson/add.twig', $data);
     }
 
+    public function edit(Request $request, Response $response, $args) {
+        $route = $request->getAttribute('route');
+        $lessonID = $route->getArgument('id');
+        $data['lesson'] = $this->container['db']->get('lessons', ['id', 'name', 'course_id', 'slides_cnt'],
+                                                    ['id' => $lessonID]);
+        if($request->isPost()) {
+            $lessonValidator = Validator::key('name', Validator::stringType()->length(2,255));
+
+            try{
+                $lessonValidator->assert($request->getParsedBody());
+            } catch (NestedValidationException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                ));
+            }
+            if($lessonValidator->validate($request->getParsedBody()) && isset($lessonID) && !empty($lessonID) && intval($lessonID)) {
+                $input = $request->getParsedBody();
+                $this->container['db']->update('lessons', [
+                    'name' => $input['name'],
+                ], [
+                    "id[=]" => $lessonID
+                ]);
+                $data['lesson']['name'] = $input['name'];
+                $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
+            } else {
+                $data['errors'] = $errors;
+            }
+        }
+
+        $this->title = 'Edit: '.$data['course']['name'];
+        $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'],
+            ['id' => $data['lesson']['course_id']]);
+
+        $this->render($response, 'lesson/edit.twig', $data);
+    }
+
 }

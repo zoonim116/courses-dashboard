@@ -70,6 +70,7 @@ $(document).ready(function() {
             '    <ul class="dropdown-menu" role="menu">\n' +
             '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="delete" tabindex="-1" href="#">Delete</a></li>\n' +
             '    </ul>\n' +
             '  </div>'
         } ]
@@ -84,6 +85,9 @@ $(document).ready(function() {
                 break;
             case 'edit' :
                 location.href = location.origin + '/lesson/edit/' + data.id;
+                break;
+            case 'delete' :
+                location.href = location.origin + '/lesson/delete/' + data.id;
                 break;
             default:
                 location.href = location.origin + '/lesson/view/' + data.id;
