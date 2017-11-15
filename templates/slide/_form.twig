@@ -3,9 +3,14 @@
         <label for="name">Text/Question:</label>
         <input type="text" class="form-control" id="name" name="name" placeholder="Text/Question" value="{{ slide.txt }}">
     </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" name="above"> Above?
+        </label>
+    </div>
     <div class="form-group clearfix">
         <div class="">
-            <a href="#" class="thumbnail update-thumbnail" data-course="{{ slide.id }}">
+            <a href="#" class="thumbnail update-slide-img" data-course="{{ slide.id }}">
                 <img src="{{ slide.img }}">
                 <input type="hidden" name="img_url" value="{{ slide.img }}" >
             </a>

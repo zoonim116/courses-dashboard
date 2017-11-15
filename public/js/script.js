@@ -96,9 +96,19 @@ $(document).ready(function() {
         return false;
     });
 
-    $('.update-thumbnail').on('click', function () {
+    $('.update-thumbnail').on('click', function (e) {
+        e.preventDefault();
         $('#course-cover').trigger('click');
     });
+
+    $('.update-slide-img').on('click', function (e) {
+        e.preventDefault();
+        if($('[name="above"]:checkbox:checked').length > 0) {
+            return false;
+        } else {
+            $('#course-cover').trigger('click');
+        }
+    })
 
     $(document).on('change', '#course-cover', function () {
         var file = this.files[0];

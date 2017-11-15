@@ -48,10 +48,26 @@ class SlideController extends BaseController
             $route = $request->getAttribute('route');
             $lessonID = $route->getArgument('lesson_id');
             $id = $route->getArgument('id');
-            $prevSlide = $this->container['db']->get('slides', 'r_order', ['id' => $newID]);
-//            $this->reorder($lessonID, $id, $prevSlide);
-            $this->create($prevSlide, $request->getParsedBody());
+            $slideValidator = Validator::key('name', Validator::stringType()->length(2,255));
+            try{
+                $slideValidator->assert($request->getParsedBody());
+            } catch (NestedValidationException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                ));
+            }
+            if($slideValidator->validate($request->getParsedBody()) && isset($lessonID) && isset($id)) {
+                $prevSlide = $this->container['db']->get('slides', 'r_order', ['id' => $id]);
+                if ($prevSlide) {
+                    $this->reorder($lessonID, $id, $prevSlide);
+                    $this->create($prevSlide, $request->getParsedBody());
+                } else {
+                    $this->create(0, $request->getParsedBody());
+                }
 
+            } else {
+                $data['errors'] = $errors;
+            }
         }
         $this->render($response, 'slide/add.twig', $data);
     }
@@ -76,8 +92,13 @@ class SlideController extends BaseController
     }
 
     private function create($prevPosition, $data) {
-        echo "<pre>";
-        die(var_dump($data));
+        $data = $this->isQuestion($data);
+        $position = 0;
+        if($prevPosition) {
+            $position = $prevPosition + 1;
+        }
+        $this->container['db']->insert('slides');
+
     }
 
     private function getAboveImg() {
@@ -85,7 +106,7 @@ class SlideController extends BaseController
     }
 
     private function isQuestion($data) {
-        if(!empty($data['question']) && !empty($data['answer'])) {
+        if(!empty($data['answer'])) {
             $data['img'] = '';
         }
         return $data;
