@@ -10,6 +10,9 @@ $app->get('/course/view/{id}', \App\Src\Controllers\CourseController::class. ':v
 $app->get('/lesson/by-course/{id}', \App\Src\Controllers\LessonController::class. ':getLessonByCourseId');
 $app->map(['GET', 'POST'], '/lesson/add/{id}', \App\Src\Controllers\LessonController::class. ':add');
 $app->map(['GET', 'POST'], '/lesson/edit/{id}', \App\Src\Controllers\LessonController::class. ':edit');
+$app->get( '/slides/{id}', \App\Src\Controllers\SlideController::class. ':index');
+$app->post( '/slides/new-order', \App\Src\Controllers\SlideController::class. ':updateSlidesOrder');
+$app->get( '/slides/by-lesson/{id}', \App\Src\Controllers\SlideController::class. ':getSlidesByLessonId');
 
 
 

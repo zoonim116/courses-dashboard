@@ -81,7 +81,7 @@ $(document).ready(function() {
         var data = lessons.row( $(this).parents('tr') ).data();
         switch ($(this).attr('data-action')) {
             case 'view' :
-                location.href = location.origin + '/lesson/view/' + data.id;
+                location.href = location.origin + '/slides/' + data.id;
                 break;
             case 'edit' :
                 location.href = location.origin + '/lesson/edit/' + data.id;
@@ -127,7 +127,63 @@ $(document).ready(function() {
             };
         };
         xhr.send(fd);
-
         return false;
     });
+
+    slides = $('#slides-list').DataTable({
+        "processing": true,
+        //"serverSide": true, // recommended to use serverSide when data is more than 10000 rows for performance reasons
+        // "stateSave": true,
+        "order": true,
+        "rowReorder": true,
+        "ajax": {
+            url: "/slides/by-lesson/" + window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1),
+            dataSrc: ''
+        },
+        "columns": [
+            { data: 'id' },
+            { data: 'txt' },
+            { data: 'img' },
+            { data: 'answer' },
+            { data: 'option_1' },
+            { data: 'option_2' },
+            { data: 'option_3' },
+            { data: 'action' },
+        ],
+        "columnDefs": [ {
+            "targets": -1,
+            "data": 'action',
+            "defaultContent": '<div class="dropdown">\n' +
+            '    <button class="btn btn-default btn-xs dropdown-toggle"  type="button" data-toggle="dropdown">Select\n' +
+            '    <span class="caret"></span></button>\n' +
+            '    <ul class="dropdown-menu" role="menu">\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="delete" tabindex="-1" href="#">Delete</a></li>\n' +
+            '    </ul>\n' +
+            '  </div>'
+            }
+        ]
+    });
+    new $.fn.dataTable.FixedHeader( slides, {
+        headerOffset: 50
+    } );
+
+    slides.on( 'row-reorder', function ( e, diff, edit ) {
+        var positiions = [];
+        for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+            var rowData = slides.row( diff[i].node ).data();
+            positiions.push({'id' : rowData.id, 'new' : diff[i].newPosition, 'old' : diff[i].oldPosition});
+        }
+        if(positiions.length > 0) {
+            $.ajax({
+                type: "POST",
+                url: '/slides/new-order',
+                data: {"data" : positiions},
+                success: function (response) {
+                    slides.ajax.reload();
+                },
+            }); 
+        }
+    } );
 });

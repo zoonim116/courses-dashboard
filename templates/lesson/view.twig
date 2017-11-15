@@ -1,22 +1,26 @@
 {% extends "layout.twig" %}
 {% block content %}
     <h1>{{ title }}</h1>
-    <div class="col-sm-3 left-navigation">
-        <div class="list-group">
-            <a href="#" class="list-group-item active">
-                List of courses
-            </a>
-            <a href="/course/add" class="list-group-item">Add new</a>
-        </div>
-    </div>
-    <div class="col-sm-9">
+    {#<div class="col-sm-3 left-navigation">#}
+        {#<div class="list-group">#}
+            {#<a href="#" class="list-group-item active">#}
+                {#List of courses#}
+            {#</a>#}
+            {#<a href="/course/add" class="list-group-item">Add new</a>#}
+        {#</div>#}
+    {#</div>#}
+    <div class="col-sm-12">
         <div class="row">
-            <table id="lessons-list" class="table table-striped" cellspacing="0" width="100%">
+            <table id="slides-list" class="table table-striped" cellspacing="0" width="100%">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Slides</th>
+                    <th>Text/Question</th>
+                    <th>Image</th>
+                    <th>Answer</th>
+                    <th>Option 1</th>
+                    <th>Option 2</th>
+                    <th>Option 3</th>
                     <th>Action</th>
                 </tr>
                 </thead>

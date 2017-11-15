@@ -95,4 +95,11 @@ class LessonController extends BaseController {
         $this->render($response, 'lesson/edit.twig', $data);
     }
 
+    public function delete(Request $request, Response $response, $args) {
+        $route = $request->getAttribute('route');
+        $lessonID = $route->getArgument('id');
+        $this->container['db']->delete('lessons', ['AND' => ['id' => $lessonID]]);
+        return $response->withRedirect('');
+    }
+
 }

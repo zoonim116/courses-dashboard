@@ -45,6 +45,7 @@ class CourseController extends BaseController
         $courseId = $route->getArgument('id');
         $data['course'] = $this->container['db']->get('courses', ['id', 'name', 'category', 'img', 'author', 'description'],
                                                                 ['id' => $courseId]);
+        $this->title = $data['course']['name'] . ' lessons:';
         $this->render($response, 'course/view.twig', $data);
     }
 
