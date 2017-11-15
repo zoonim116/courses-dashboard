@@ -49,7 +49,7 @@ class SlideController extends BaseController
         if($request->isPost()) {
             $route = $request->getAttribute('route');
             $lessonID = $route->getArgument('lesson_id');
-            $id = $route->getArgument('id');
+            $id = $route->getArgument('id') ? $route->getArgument('id') : 0;
             $slideValidator = Validator::key('name', Validator::stringType()->length(2,255));
             try{
                 $slideValidator->assert($request->getParsedBody());
@@ -98,18 +98,16 @@ class SlideController extends BaseController
     private function create($prevPosition, $lessonID, $data) {
         $data = $this->isQuestion($data);
         $position = 0;
-        echo "<pre>";
-        die(var_dump($prevPosition));
-        if($prevPosition['r_order']) {
+        if($prevPosition['r_order'] == 0) {
             $position = $prevPosition['r_order'] + 1;
         }
         if(isset($data['above'])) {
-            $data['img'] = $prevPosition['img'];
+            $data['img'] = $prevPosition['img'] ? $prevPosition['img'] : '';
         }
         $this->container['db']->insert('slides', [
             'txt' => $data['name'],
-            'lesson_id' => $lessonID,
-            'r_order' => $position,
+            'lesson_id' => intval($lessonID),
+            'r_order' => intval($position),
             'img' => $data['img'],
             'answer' => $data['answer'],
             'option_1' => $data['option_1'],

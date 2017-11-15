@@ -159,6 +159,16 @@ $(document).ready(function() {
             { data: 'option_3' },
             { data: 'action' },
         ],
+        dom: 'Bfrtip',
+        buttons: [
+            {
+                text: 'Add new item',
+                action: function ( e, dt, node, config ) {
+                    var lessonID = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+                    location.href = location.origin + '/slides/add/' + lessonID + '/';
+                }
+            }
+        ],
         "columnDefs": [ {
             "targets": -1,
             "data": 'action',
