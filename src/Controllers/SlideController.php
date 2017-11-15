@@ -5,6 +5,8 @@ namespace App\Src\Controllers;
 
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Respect\Validation\Validator;
+use Respect\Validation\Exceptions\NestedValidationException;
 
 class SlideController extends BaseController
 {
@@ -57,12 +59,14 @@ class SlideController extends BaseController
                 ));
             }
             if($slideValidator->validate($request->getParsedBody()) && isset($lessonID) && isset($id)) {
-                $prevSlide = $this->container['db']->get('slides', 'r_order', ['id' => $id]);
+                $prevSlide = $this->container['db']->get('slides', ['r_order', 'img'], ['id' => $id]);
                 if ($prevSlide) {
-                    $this->reorder($lessonID, $id, $prevSlide);
-                    $this->create($prevSlide, $request->getParsedBody());
+                    $this->reorder($lessonID, $prevSlide['r_order']);
+                    $this->create($prevSlide, $lessonID, $request->getParsedBody());
+                    $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
                 } else {
-                    $this->create(0, $request->getParsedBody());
+                    $this->create(0, $lessonID, $request->getParsedBody());
+                    $this->container['flash']->addMessage('success', 'Item successfully saved.');
                 }
 
             } else {
@@ -74,11 +78,11 @@ class SlideController extends BaseController
 
 
     /**
-     * Reoder slides according to the new insert ID
+     * Reorder r_order column accoring to the new insert
      * @param $lessonID
-     * @param $newID
+     * @param $prev
      */
-    private function reorder($lessonID, $newID, $prev) {
+    private function reorder($lessonID, $prev) {
         $slides = $this->container['db']->select('slides', 'id', ["AND" => [ "lesson_id" => $lessonID, "r_order[>]" => $prev ]]);
         $nextPosition = $prev + 2;
         foreach ($slides as $slide) {
@@ -91,17 +95,27 @@ class SlideController extends BaseController
         }
     }
 
-    private function create($prevPosition, $data) {
+    private function create($prevPosition, $lessonID, $data) {
         $data = $this->isQuestion($data);
         $position = 0;
-        if($prevPosition) {
-            $position = $prevPosition + 1;
+        echo "<pre>";
+        die(var_dump($prevPosition));
+        if($prevPosition['r_order']) {
+            $position = $prevPosition['r_order'] + 1;
         }
-        $this->container['db']->insert('slides');
-
-    }
-
-    private function getAboveImg() {
+        if(isset($data['above'])) {
+            $data['img'] = $prevPosition['img'];
+        }
+        $this->container['db']->insert('slides', [
+            'txt' => $data['name'],
+            'lesson_id' => $lessonID,
+            'r_order' => $position,
+            'img' => $data['img'],
+            'answer' => $data['answer'],
+            'option_1' => $data['option_1'],
+            'option_2' => $data['option_2'],
+            'option_3' => $data['option_3'],
+        ]);
 
     }
 
