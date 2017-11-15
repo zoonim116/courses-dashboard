@@ -130,7 +130,13 @@ $(document).ready(function() {
             if (this.status == 200) {
                 var resp = JSON.parse(this.response);
                 console.log('Server got:', resp);
-                document.querySelector('.update-thumbnail img').src = resp.url;
+                if(document.querySelector('.update-thumbnail img')){
+                    document.querySelector('.update-thumbnail img').src = resp.url;
+                } else {
+                    document.querySelector('.update-slide-img img').src = resp.url;
+                }
+
+
                 document.querySelector('.progress').style.display = 'none';
                 document.querySelector('[name="img_url"]').value = resp.url;
             };

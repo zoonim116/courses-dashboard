@@ -46,10 +46,13 @@ class SlideController extends BaseController
         $this->title = 'Add new item';
         $data = [];
         $data['slide'] = ['img' => $request->getUri()->getBaseUrl().'/img/no_image.jpeg'];
+        $route = $request->getAttribute('route');
+        $lessonID = $route->getArgument('lesson_id');
+        $id = $route->getArgument('id') ? $route->getArgument('id') : 0;
+        $data['lesson'] = $this->container['db']->get('lessons', ['id', 'name', 'course_id', 'slides_cnt'],
+            ['id' => $lessonID]);
         if($request->isPost()) {
-            $route = $request->getAttribute('route');
-            $lessonID = $route->getArgument('lesson_id');
-            $id = $route->getArgument('id') ? $route->getArgument('id') : 0;
+
             $slideValidator = Validator::key('name', Validator::stringType()->length(2,255));
             try{
                 $slideValidator->assert($request->getParsedBody());
@@ -68,6 +71,7 @@ class SlideController extends BaseController
                     $this->create(0, $lessonID, $request->getParsedBody());
                     $this->container['flash']->addMessage('success', 'Item successfully saved.');
                 }
+                $data['slide'] = $request->getParsedBody();
 
             } else {
                 $data['errors'] = $errors;
@@ -102,13 +106,13 @@ class SlideController extends BaseController
             $position = $prevPosition['r_order'] + 1;
         }
         if(isset($data['above'])) {
-            $data['img'] = $prevPosition['img'] ? $prevPosition['img'] : '';
+            $data['img_url'] = $prevPosition['img'] ? $prevPosition['img'] : '';
         }
         $this->container['db']->insert('slides', [
             'txt' => $data['name'],
             'lesson_id' => intval($lessonID),
             'r_order' => intval($position),
-            'img' => $data['img'],
+            'img' => $data['img_url'],
             'answer' => $data['answer'],
             'option_1' => $data['option_1'],
             'option_2' => $data['option_2'],
