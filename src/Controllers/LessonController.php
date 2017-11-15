@@ -8,6 +8,13 @@ use Respect\Validation\Validator;
 
 class LessonController extends BaseController {
 
+    /**
+     * Get lessons by Course
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return json with lessons
+     */
     public function getLessonByCourseId(Request $request, Response $response, $args) {
         if($request->isXhr()) {
             $route = $request->getAttribute('route');
@@ -25,6 +32,12 @@ class LessonController extends BaseController {
         }
     }
 
+    /**
+     * Add new lessons
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     */
     public function add(Request $request, Response $response, $args) {
         $this->title = 'Add new item';
         $route = $request->getAttribute('route');
@@ -59,6 +72,12 @@ class LessonController extends BaseController {
         $this->render($response, 'lesson/add.twig', $data);
     }
 
+    /**
+     * Edit lesson
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     */
     public function edit(Request $request, Response $response, $args) {
         $route = $request->getAttribute('route');
         $lessonID = $route->getArgument('id');

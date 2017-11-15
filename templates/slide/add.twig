@@ -1,0 +1,36 @@
+{% extends "layout.twig" %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <div class="col-sm-3 left-navigation">
+        <div class="list-group">
+            <a href="#" class="list-group-item active">Add new</a>
+            <a href="/course/view/{{ course.id }}" class="list-group-item ">
+                Back to {{ course.name }}
+            </a>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        {% if errors %}
+            <div class="alert alert-danger" role="alert">
+                <strong>Oh snap!</strong>  Change a few things up and try submitting again:
+                {% include '_partials/errors.twig' %}
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success" role="alert">
+                <strong>Well done!</strong>
+                Course successfully saved.
+            </div>
+        {% endif %}
+        {% if flash('success')  %}
+            <div class="alert alert-success" role="alert">
+                {% for msg in flash('success') %}
+                    {{ msg }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="row">
+            {% include 'slide/_form.twig' %}
+        </div>
+    </div>
+{% endblock %}

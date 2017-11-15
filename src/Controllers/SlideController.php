@@ -39,4 +39,56 @@ class SlideController extends BaseController
         }
     }
 
+
+    public function add(Request $request, Response $response, $args) {
+        $this->title = 'Add new item';
+        $data = [];
+        $data['slide'] = ['img' => $request->getUri()->getBaseUrl().'/img/no_image.jpeg'];
+        if($request->isPost()) {
+            $route = $request->getAttribute('route');
+            $lessonID = $route->getArgument('lesson_id');
+            $id = $route->getArgument('id');
+            $prevSlide = $this->container['db']->get('slides', 'r_order', ['id' => $newID]);
+//            $this->reorder($lessonID, $id, $prevSlide);
+            $this->create($prevSlide, $request->getParsedBody());
+
+        }
+        $this->render($response, 'slide/add.twig', $data);
+    }
+
+
+    /**
+     * Reoder slides according to the new insert ID
+     * @param $lessonID
+     * @param $newID
+     */
+    private function reorder($lessonID, $newID, $prev) {
+        $slides = $this->container['db']->select('slides', 'id', ["AND" => [ "lesson_id" => $lessonID, "r_order[>]" => $prev ]]);
+        $nextPosition = $prev + 2;
+        foreach ($slides as $slide) {
+            $this->container['db']->update('slides', [
+                'r_order' => $nextPosition,
+            ], [
+                "id[=]" => $slide
+            ]);
+            $nextPosition++;
+        }
+    }
+
+    private function create($prevPosition, $data) {
+        echo "<pre>";
+        die(var_dump($data));
+    }
+
+    private function getAboveImg() {
+
+    }
+
+    private function isQuestion($data) {
+        if(!empty($data['question']) && !empty($data['answer'])) {
+            $data['img'] = '';
+        }
+        return $data;
+    }
+
 }

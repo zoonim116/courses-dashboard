@@ -94,7 +94,6 @@ $(document).ready(function() {
                 break;
         }
         return false;
-
     });
 
     $('.update-thumbnail').on('click', function () {
@@ -130,7 +129,7 @@ $(document).ready(function() {
         return false;
     });
 
-    slides = $('#slides-list').DataTable({
+    var slides = $('#slides-list').DataTable({
         "processing": true,
         //"serverSide": true, // recommended to use serverSide when data is more than 10000 rows for performance reasons
         // "stateSave": true,
@@ -159,15 +158,41 @@ $(document).ready(function() {
             '    <ul class="dropdown-menu" role="menu">\n' +
             '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
+            '      <li role="presentation"><a role="menuitem" data-action="add" tabindex="-1" href="#">Add below</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="delete" tabindex="-1" href="#">Delete</a></li>\n' +
             '    </ul>\n' +
             '  </div>'
             }
         ]
     });
-    new $.fn.dataTable.FixedHeader( slides, {
+
+    new $.fn.dataTable.FixedHeader(slides, {
         headerOffset: 50
-    } );
+    });
+
+    $('#slides-list tbody').on( 'click', 'a', function (e) {
+        e.preventDefault();
+        var lessonID = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+        var data = slides.row( $(this).parents('tr') ).data();
+        switch ($(this).attr('data-action')) {
+            case 'view' :
+                location.href = location.origin + '/slides/view/' + data.id;
+                break;
+            case 'edit' :
+                location.href = location.origin + '/slides/edit/' + data.id;
+                break;
+            case 'add' :
+                location.href = location.origin + '/slides/add/' + lessonID + '/' + data.id;
+                break;
+            case 'delete' :
+                location.href = location.origin + '/slides/delete/' + data.id;
+                break;
+            default:
+                location.href = location.origin + '/slides/view/' + data.id;
+                break;
+        }
+        return false;
+    });
 
     slides.on( 'row-reorder', function ( e, diff, edit ) {
         var positiions = [];
