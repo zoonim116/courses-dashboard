@@ -41,6 +41,47 @@ class SlideController extends BaseController
         }
     }
 
+    public function edit(Request $request, Response $response, $args) {
+        $route = $request->getAttribute('route');
+        $slideID = $route->getArgument('id');
+        $data['slide'] = $this->container['db']->get('slides', ['txt', 'lesson_id' ,'img', 'answer', 'option_1', 'option_2', 'option_3'],
+            ['id' => $slideID]);
+        if(!$data['slide']['img']) {
+            $data['slide']['img'] =  $request->getUri()->getBaseUrl().'/img/no_image.jpeg';
+        }
+        $data['lesson'] = $this->container['db']->get('lessons', ['id', 'name', 'course_id', 'slides_cnt'],
+            ['id' => $data['slide']['lesson_id']]);
+
+        if($request->isPost()) {
+            $slideValidator = Validator::key('name', Validator::stringType()->length(2,255));
+            try{
+                $slideValidator->assert($request->getParsedBody());
+            } catch (NestedValidationException $e) {
+                $errors = $e->findMessages(array(
+                    'name'     => '{{name}} is required',
+                ));
+            }
+            if($slideValidator->validate($request->getParsedBody()) && isset($slideID) && intval($slideID)) {
+                $input = $request->getParsedBody();
+                $this->container['db']->update('slides', [
+                    'txt' => $input['name'],
+                    'img' => $input['img_url'],
+                    'answer' => $input['answer'],
+                    'option_1' => $input['option_1'],
+                    'option_2' => $input['option_2'],
+                    'option_3' => $input['option_3'],
+                ], [
+                    "id[=]" => $slideID
+                ]);
+                $data['slide'] = $request->getParsedBody();
+                $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
+            } else {
+                $data['errors'] = $errors;
+            }
+        }
+        $this->title = 'Edit slide';
+        $this->render($response, 'slide/edit.twig', $data);
+    }
 
     public function add(Request $request, Response $response, $args) {
         $this->title = 'Add new item';
