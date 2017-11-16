@@ -109,9 +109,12 @@ class SlideController extends BaseController
                     $this->create($prevSlide, $lessonID, $request->getParsedBody());
                     $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
                 } else {
+                    $this->shiftOrders($lessonID);
                     $this->create(0, $lessonID, $request->getParsedBody());
                     $this->container['flash']->addMessage('success', 'Item successfully saved.');
                 }
+                $this->container['db']->query('UPDATE lessons SET slides_cnt = slides_cnt + 1 WHERE id = ' .
+                                                            $data['lesson']['id']);
                 $data['slide'] = $request->getParsedBody();
 
             } else {
@@ -137,6 +140,19 @@ class SlideController extends BaseController
                 "id[=]" => $slide
             ]);
             $nextPosition++;
+        }
+    }
+
+    private function shiftOrders($lessonID) {
+        $slides = $this->container['db']->select('slides', ['id ','r_order'], ['r_order[>]' => 0]);
+        if($slides){
+          foreach ($slides as $slide) {
+              $this->container['db']->update('slides', [
+                  'r_order' => $slide['r_order'] + 1,
+              ], [
+                  "id[=]" => $slide['id']
+              ]);
+          }
         }
     }
 
@@ -167,6 +183,16 @@ class SlideController extends BaseController
             $data['img'] = '';
         }
         return $data;
+    }
+
+    public function delete(Request $request, Response $response, $args) {
+        $route = $request->getAttribute('route');
+        $id = $route->getArgument('id');
+        $slide = $this->container['db']->get('slides', 'lesson_id', ['id' => $id]);
+        $this->container['db']->delete('slides', ['id' => $id]);
+        $this->container['db']->query('UPDATE lessons SET slides_cnt = slides_cnt - 1 WHERE id = ' .
+            $slide);
+        return $response->withRedirect('/slides/'.$slide, 301);
     }
 
 }

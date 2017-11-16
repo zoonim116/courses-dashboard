@@ -13,6 +13,7 @@ $app->map(['GET', 'POST'], '/lesson/edit/{id}', \App\Src\Controllers\LessonContr
 $app->map( ['GET', 'POST'], '/slides/add/{lesson_id}/[{id}]', \App\Src\Controllers\SlideController::class. ':add');
 $app->get( '/slides/{id}', \App\Src\Controllers\SlideController::class. ':index');
 $app->map(['GET', 'POST'], '/slides/edit/{id}', \App\Src\Controllers\SlideController::class. ':edit');
+$app->get('/slides/delete/{id}', \App\Src\Controllers\SlideController::class. ':delete');
 $app->post( '/slides/new-order', \App\Src\Controllers\SlideController::class. ':updateSlidesOrder');
 $app->get( '/slides/by-lesson/{id}', \App\Src\Controllers\SlideController::class. ':getSlidesByLessonId');
 
