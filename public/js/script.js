@@ -70,7 +70,6 @@ $(document).ready(function() {
             '    <ul class="dropdown-menu" role="menu">\n' +
             '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
-            '      <li role="presentation"><a role="menuitem" data-action="delete" tabindex="-1" href="#">Delete</a></li>\n' +
             '    </ul>\n' +
             '  </div>'
         } ]
@@ -168,12 +167,21 @@ $(document).ready(function() {
         dom: 'Bfrtip',
         buttons: [
             {
+                text: 'Back to lesson',
+                action: function ( e, dt, node, config ) {
+                    var lessonID = document.querySelector('[name="course_id"]').value;
+                    location.href = location.origin + '/course/view/' + lessonID;
+                }
+            },
+
+            {
                 text: 'Add new item',
                 action: function ( e, dt, node, config ) {
                     var lessonID = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
                     location.href = location.origin + '/slides/add/' + lessonID + '/';
                 }
             }
+
         ],
         "columnDefs": [ {
             "targets": -1,
@@ -182,7 +190,6 @@ $(document).ready(function() {
             '    <button class="btn btn-default btn-xs dropdown-toggle"  type="button" data-toggle="dropdown">Select\n' +
             '    <span class="caret"></span></button>\n' +
             '    <ul class="dropdown-menu" role="menu">\n' +
-            '      <li role="presentation"><a role="menuitem" data-action="view" tabindex="-1" href="#">View</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="edit" tabindex="-1" href="#">Edit</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="add" tabindex="-1" href="#">Add below</a></li>\n' +
             '      <li role="presentation"><a role="menuitem" data-action="delete" tabindex="-1" href="#">Delete</a></li>\n' +

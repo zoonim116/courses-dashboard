@@ -12,7 +12,10 @@ class SlideController extends BaseController
 {
 
     public function index(Request $request, Response $response, $args){
-        $this->render($response, 'lesson/view.twig');
+        $route = $request->getAttribute('route');
+        $lessonID = $route->getArgument('id');
+        $data['lesson'] = $this->container['db']->get('lessons', 'course_id', ['id' => $lessonID]);
+        $this->render($response, 'lesson/view.twig', $data);
     }
 
     public function getSlidesByLessonId(Request $request, Response $response, $args) {
@@ -110,7 +113,7 @@ class SlideController extends BaseController
                     $this->container['flash']->addMessage('success', 'Lesson successfully saved.');
                 } else {
                     $this->shiftOrders($lessonID);
-                    $this->create(0, $lessonID, $request->getParsedBody());
+                    $this->create(null, $lessonID, $request->getParsedBody());
                     $this->container['flash']->addMessage('success', 'Item successfully saved.');
                 }
                 $this->container['db']->query('UPDATE lessons SET slides_cnt = slides_cnt + 1 WHERE id = ' .
@@ -159,7 +162,7 @@ class SlideController extends BaseController
     private function create($prevPosition, $lessonID, $data) {
         $data = $this->isQuestion($data);
         $position = 0;
-        if($prevPosition['r_order'] == 0) {
+        if($prevPosition['r_order'] != null) {
             $position = $prevPosition['r_order'] + 1;
         }
         if(isset($data['above'])) {
@@ -189,6 +192,7 @@ class SlideController extends BaseController
         $route = $request->getAttribute('route');
         $id = $route->getArgument('id');
         $slide = $this->container['db']->get('slides', 'lesson_id', ['id' => $id]);
+        $this->container['db']->query('UPDATE slides SET r_order = r_order - 1 WHERE lesson_id = ' . $slide . ' AND id > ' . $id);
         $this->container['db']->delete('slides', ['id' => $id]);
         $this->container['db']->query('UPDATE lessons SET slides_cnt = slides_cnt - 1 WHERE id = ' .
             $slide);
